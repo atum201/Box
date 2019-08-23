@@ -1,0 +1,49 @@
+<head>
+	<script>
+		function testRegex(){
+			var jsonDate = "/Date(1224043200000)/";
+			var pattern = /Date\((\d+)\)/;          
+            var results = pattern.exec(jsonDate);
+            var dt = new Date(parseInt(results[1]));
+			for(var i = 0; i<results.length;i++){
+				console.log(results[i]);
+			}
+		}
+		function testRegex1(){
+			var data = {};
+			var ar = [];
+			ar.push("a");
+			ar.push("b");
+			ar.push("c");
+			data.recievers = ar;
+			data.xxx = { a : 1, b:2};
+			//console.log(JSON.stringify(data));
+			var str = ',a,b,c ,,e,';
+			console.log(str.substring(0,1));
+			console.log(getStrArray(str, ','));
+			var s = "foobarfoobar123";
+			var pattern = /^$|\s+/;          
+            var results = pattern.test(s);
+			//alert(results);
+		}
+		function getStrArray(str, delimiter){
+			var strArr = []
+			if(typeof str != 'undefined' && str.length > 0){
+				var lastDelimiterIndex = 0;
+				var n = str.length;
+				for(var i = 0; i < n ; i++){
+					if(str[i] == delimiter){
+						strArr.push(str.substring(lastDelimiterIndex, i));
+						lastDelimiterIndex = i + 1;
+					}
+				}
+				strArr.push(str.substring(lastDelimiterIndex, n));
+			}
+			return strArr;
+		}
+
+	</script>
+</head>
+<body>
+	<input type="button" onclick="testRegex1()" value="Test Regex">
+</body>

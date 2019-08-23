@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    </head>
+    <body>
+        <meta charset="utf-8">
+        <title>Your First WebSocket!</title>
+        <script language="javascript" type="text/javascript">
+            
+            var wsUri = "ws://10.145.37.72:7777/QLVB_WebSocket/echo/";
+            var output;
+            var websocket;
+            
+            function init() {
+                output = document.getElementById("output");
+            }
+            function initSocket(){
+            	websocket = new WebSocket(wsUri + document.getElementById("userID").value);
+                websocket.onopen = function(evt) {
+                    onOpen(evt)
+                };
+                websocket.onmessage = function(evt) {
+                    onMessage(evt)
+                };
+                websocket.onerror = function(evt) {
+                    onError(evt)
+                };            	
+            }
+            function closeSocket(){
+            	websocket.close();
+            }
+            function send_message() {
+				var lreceivers= [];
+            	lreceivers.push('lanhdaoqh@vnpt.vn');
+            	lreceivers.push('vanthuqh@vnpt.vn');
+            	lreceivers.push('c');
+            	var msg = {
+          		  recievers: lreceivers,
+          		  data: {"id":"20","loaithongbao":"1","tieude":"test h7","noidung":"","link":"VAN_BAN_DI|20002258|vanban_di_choxuly","thoigiantao":"Fri Apr 14 15:25:00 ICT 2017","nguoigui":{"hovaten":"quach.ngo.yen.phuong","avatar":""}}
+          		};
+				console.log(msg);
+            	/*var msg = {
+          		  recievers: 'quach.ngo.yen.phuong~b~c',
+          		  data: textID.value
+          		};*/
+          		// Send the msg object as a JSON-formatted string.
+          		websocket.send(JSON.stringify(msg));
+            }
+            function onOpen(evt) {
+                writeToScreen("Connected to Endpoint!");
+                
+            }
+            function onMessage(evt) {
+                writeToScreen("Message Received: " + evt.data);
+            }
+            function onError(evt) {
+                writeToScreen('ERROR: ' + evt.data);
+            }
+            function doSend(message) {
+                writeToScreen("Message Sent: " + message);
+                websocket.send(message);
+                //websocket.close();
+            }
+            function writeToScreen(message) {
+                var pre = document.createElement("p");
+                pre.style.wordWrap = "break-word";
+                pre.innerHTML = message;
+                 
+                output.appendChild(pre);
+            }
+            window.addEventListener("load", init, false);
+        </script>
+        <h1 style="text-align: center;">Hello World WebSocket Client</h2>
+        <br>
+        <div style="text-align: center;">
+            <form action="">
+            	<input id="userID" value="user1" type="text"><br>
+            	<input onclick="initSocket()" value="Init" type="button">
+            	<input onclick="closeSocket()" value="Close" type="button">
+                <input onclick="send_message()" value="Send" type="button">
+                <input id="textID" name="message" value="Hello WebSocket!" type="text"><br>
+            </form>
+        </div>
+        <div id="output"></div>
+</body>
+</html>

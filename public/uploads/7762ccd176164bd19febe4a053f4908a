@@ -1,0 +1,34 @@
+<script>
+var chat_socket;
+var chat_user;
+var chatapp;
+
+function check_connect_chat(){
+	setTimeout(function(){ 
+		$.getScript( "{p0chat_server}/js/socket.io.js", function( data, textStatus, jqxhr ) {
+			if(jqxhr.status == 200){
+				$('head').append('<link rel="stylesheet" type="text/css" href="mycss/live.css">');
+				$('head').append('<link rel="stylesheet" type="text/css" href="mycss/chosen.min.css">');
+				//$('head').append('<link rel="stylesheet" type="text/css" href="mycss/font-awesome.min.css">');
+
+				//$('<script />', { type : 'text/javascript', src : '{p0chat_server}/js/socket.io.js'}).appendTo('head');
+				$('<script />', { type : 'text/javascript', src : 'myJS/chosen.jquery.js'}).appendTo('head');
+				$('<script />', { type : 'text/javascript', src : 'myJS/lodash.min.js'}).appendTo('head');
+				$('<script />', { type : 'text/javascript', src : 'myJS/chat-egov.js'}).appendTo('head');
+				setTimeout(function(){ 
+					initChat();
+				}, 500);
+				
+			}
+		});
+	}, 500);
+}
+
+function initChat(){
+	chat_socket = io("{p0chat_server}");
+	chat_user = {userId:"{p0sys_userid}"};
+	chatapp = new ChatApp(chat_user, chat_socket, {'server' : '{p0chat_server}'});
+	$("body").append(chatapp.dom);
+}
+
+</script>

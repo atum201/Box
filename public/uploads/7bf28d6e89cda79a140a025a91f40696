@@ -1,0 +1,182 @@
+package neo.smartui.applet;
+
+import java.applet.Applet;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Toolkit;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Writer;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JFrame;
+import neo.smartui.common.ConvertFont;
+import neo.smartui.report.AppletDataSource;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JRViewer;
+
+public class PrintApplet
+  extends Applet
+{
+  public String printtofile_;
+  public String setdefaultprinter_;
+  public String pathfile_;
+  public String phieu_id_;
+  public String vat_;
+  public String printer_;
+  public String content_;
+  public String design_;
+  public String data_;
+  JFrame frame = null;
+  
+  public void init()
+  {
+    this.design_ = decode(getParameter("jasper_design+"));
+    if (this.design_ == null) {
+      this.design_ = getParameter("jasper_design");
+    }
+    this.data_ = decode(getParameter("xml_data+"));
+    if (this.data_ == null) {
+      this.data_ = getParameter("xml_data");
+    }
+    StartPrintVAT();
+  }
+  
+  public void StartPrintVAT()
+  {
+    if ((this.data_ == null) || (this.design_ == null))
+    {
+      this.content_ = "Co loi trong qua trinh in hoa don";
+      paint(getGraphics());
+      return;
+    }
+    this.content_ = String.valueOf(this.vat_);
+    
+    this.content_ = this.content_.replace("#", " ");
+    this.content_ = this.content_.replace("$newline$", "\r\n");
+    try
+    {
+      Map paras = new HashMap();
+      Map filterParas = new HashMap();
+      String[] sfilter_ = { "REPORT_PARAMETERS_MAP", 
+        "JASPER_REPORT", "REPORT_CONNECTION", "REPORT_MAX_COUNT", 
+        "REPORT_DATA_SOURCE", "REPORT_SCRIPTLET", "REPORT_LOCALE", 
+        "REPORT_RESOURCE_BUNDLE", "REPORT_TIME_ZONE", 
+        "REPORT_FORMAT_FACTORY", "REPORT_CLASS_LOADER", 
+        "REPORT_URL_HANDLER_FACTORY", "REPORT_TEMPLATES", 
+        "REPORT_FILE_RESOLVER", "REPORT_VIRTUALIZER", 
+        "IS_IGNORE_PAGINATION" };
+      for (int k = 0; k < sfilter_.length; k++) {
+        filterParas.put(sfilter_[k], "");
+      }
+      URL url = new URL(getCodeBase(), this.design_);
+      JasperReport jasperReport = (JasperReport)JRLoader.loadObject(url);
+      JRParameter[] jrPara = jasperReport.getParameters();
+      for (int i = 0; i < jrPara.length; i++) {
+        if (!filterParas.containsKey(jrPara[i].getName()))
+        {
+          String value_ = getParameter(jrPara[i].getName());
+          value_ = value_ == null ? " " : value_;
+          System.out.println(value_);
+          paras.put(jrPara[i].getName(), ConvertFont.UtoD(value_));
+        }
+      }
+      AppletDataSource source = new AppletDataSource(this.data_);
+      JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, paras, source);
+      JRViewer jrv = new JRViewer(jasperPrint);
+      showReport(700, 450, jrv);
+    }
+    catch (Exception ex)
+    {
+      ex.printStackTrace();
+      this.content_ = ("SecurityException:" + ex.toString());
+    }
+  }
+  
+  public void showReport(int Width, int Height, JRViewer JrViewer)
+  {
+    this.frame = new JFrame();
+    this.frame.setDefaultCloseOperation(2);
+    this.frame.setTitle("Neo Report Viewer");
+    
+    this.frame.add(JrViewer);
+    
+    this.frame.setSize(Width, Height);
+    
+    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+    this.frame.setLocation((d.width - this.frame.getSize().width) / 2, 
+      (d.height - this.frame.getSize().height) / 2);
+    
+    setBounds(0, 0, this.frame.getHeight(), this.frame.getWidth());
+    this.frame.setVisible(true);
+    
+    this.frame.toFront();
+  }
+  
+  public void paint(Graphics g)
+  {
+    g.drawString(this.content_, 100, 100);
+  }
+  
+  public void writeFile(String FileName, String Content)
+  {
+    try
+    {
+      Writer output = null;
+      File file = new File(FileName);
+      output = new BufferedWriter(new FileWriter(file));
+      output.write(Content);
+      output.close();
+    }
+    catch (IOException ex)
+    {
+      ex.printStackTrace();
+    }
+  }
+  
+  public static void main(String[] args)
+  {
+    PrintApplet p = new PrintApplet();
+    p.StartPrintVAT();
+  }
+  
+  private String encode(String s)
+  {
+    int FACTOR = 6;
+    if (s == null) {
+      return null;
+    }
+    if (s.length() == 0) {
+      return "";
+    }
+    char[] chs = s.toCharArray();
+    for (int i = 0; i < s.length(); i++) {
+      chs[i] = ((char)(((byte)chs[i] + FACTOR) % 256));
+    }
+    return new String(chs);
+  }
+  
+  private String decode(String s)
+  {
+    int FACTOR = 6;
+    if (s == null) {
+      return null;
+    }
+    if (s.length() == 0) {
+      return "";
+    }
+    char[] chs = s.toCharArray();
+    for (int i = 0; i < s.length(); i++) {
+      chs[i] = ((char)(((byte)chs[i] - FACTOR + 256) % 256));
+    }
+    return new String(chs);
+  }
+}

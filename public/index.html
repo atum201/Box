@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <title>Chat Demo</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+        <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="css/live.css">
+        <link rel="stylesheet" type="text/css" media="screen" href="css/chosen.min.css">
+    </head>
+    <body>
+        <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/chosen.jquery.js"></script>
+        <script type="text/javascript" src="js/lodash.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/chatbox.js"></script>
+    <style>
+            .hidden{
+                display: none;
+            }
+        </style>
+        <script type="text/javascript">
+            var socket = io('http://localhost:3000');
+            var user = {userId:"1046"};
+            var chatapp = new ChatBox({id:'message.toGroup'},{show:true, full:true},socket);
+            $("body").append(chatapp.dom);
+			socket.emit("login","abcbc",12312);
+        </script>
+    </body>
+</html>
