@@ -1,16 +1,16 @@
 var _dom = $("<div id='chatapp' class='chat-app'></div>");
-var ChatBox = function(box, state, socket) {
-    this.box = box; // {id:"",type:"group|user",title:"",member:[]}
-    this.membertemp = [];
+var ChatBox = function(payload, state, socket) {
+    this.box = {}; // {id:"",type:"group|user",title:"",member:[]}
     this.state = state ||   {
                                 show:true,
                                 full:true,
                                 online:false,
                                 new:0,
-                                title:"",
+                                title:"Hãy chat với chúng tôi",
                             };
     var _user = {},
-    MESSAGE_SENDER = "visitor_chat";
+        _start = false,
+        MESSAGE_SENDER = "visitor_chat";
     
     var _locdau = function(str) {
         str = str.toLowerCase();
@@ -69,10 +69,9 @@ var ChatBox = function(box, state, socket) {
 
 
     this.box_head = $("<div class=\"live-hd\">"+
-                            "<div class=\"pull-left visitor-name\">"+this.box.title+"</div>"+
+                            "<div class=\"pull-left visitor-name\">"+this.state.title+"</div>"+
                             "<div class=\"pull-right\">"+
                                 "<a href=\"javascript:void(0)\" class=\"btnclose-min\"><i class=\"fa fa-chevron-down\"></i><i class=\"fa fa-chevron-up\"></i></a>"+
-                                "<a href=\"javascript:void(0)\"><i class=\"fa fa-remove\"></i></a>"+
                             "</div>"+
                             "<div class=\"clearfix\"></div>"+
                         "</div>");
@@ -226,42 +225,7 @@ var ChatBox = function(box, state, socket) {
         return { idtemp: _randomstring(8), content: content};    
     };
     this.loadMessage = function(messageOld){
-        // var _this = this;
-        // var time = undefined;
-        // var sort = {time : -1};
-        // if(messageOld){ // load message old. history 
-        //     var date = _.first(_this.messages) ? _.first(_this.messages).time : undefined;
-        //     time = {$lt:date};
-        // }
-        // if(_this.box.type == "group"){ // load messages group.
-        //     var query = {query:{ toGroup: _this.box.id},page:0,limit:MESSAGE_LIMIT};
-        //     if(time) 
-        //         query.query.time = time;
-        //     query.sort = sort;
-        //     var field = "id, content, time, state, from, toGroup"; // full
-        //     _queryGraphql(CHAT_SERVER+"/graphql",'{message(q:\"'+JSON.stringify(query).replace(/"/g, '\\"')+'\"){'+field+'}}',{},function(data){
-        //         var messages = data.data.message || [];
-        //         messages.forEach(function(message){
-        //             message.time = parseInt(message.time);
-        //             var scroll = messageOld ? false : true;
-        //             _this.displayMessage(message,scroll);
-        //         });
-        //     });
-        // }else{// load messages user
-        //     var query = {query:{ $or:[{toUser:_user.id,from:_this.box.id},{toUser:_this.box.id,from:_user.id}]},page:0,limit:MESSAGE_LIMIT};
-        //     if(time) 
-        //         query.query.time = time;
-        //     query.sort = sort;
-        //     var field = "id, content, time, state, from, toUser"; // full
-        //     _queryGraphql(CHAT_SERVER+"/graphql",'{message(q:\"'+JSON.stringify(query).replace(/"/g, '\\"')+'\"){'+field+'}}',undefined,function(data){
-        //         var messages = data.data.message || [];
-        //         messages.forEach(function(message){
-        //             message.time = parseInt(message.time);
-        //             var scroll = messageOld ? false : true;
-        //             _this.displayMessage(message,scroll);
-        //         });
-        //     });
-        // }
+        
     };
     this.updateBox = function(box){
         var _this = this;
@@ -272,14 +236,15 @@ var ChatBox = function(box, state, socket) {
     
     var _setSocket = function(){
         
-        socket.on('SOCKET_GET_MESSAGE', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
+        socket.on('send_message', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
+            console.log(data)
             _this.displayMessage(data);
         });
         
     };
 
     var sendMessage = function (data) {
-        socket.emit('SOCKET_SEND_MESSAGE', data);
+        socket.emit('request_bot', data);
     }
 
     this.init = function () {
@@ -298,14 +263,11 @@ var ChatBox = function(box, state, socket) {
         btnToggle.on('click',function(){
             _this.state.full = _this.state.full == false;
             _this.setState();
+            if(!_start){
+                _start = true;
+                socket.emit('start_bot',payload);
+            }
             // _callback(CHATBOX_CLOSE);
-        });
-
-        var btnClose = _this.box_head.find("a .fa-remove");
-
-        btnClose.on('click',function(e){
-            _this.state.show = false;
-            _this.setState();
         });
 
         // MESSSAGE INPUT
@@ -320,15 +282,12 @@ var ChatBox = function(box, state, socket) {
             if (e.which == 13) {
                 e.preventDefault();
                 if ($(this).val() !== '' ) {
-                    var data = _this.createMessage($(this).val());
-                    sendMessage('CHATBOX_SEND_MESSAGE', data);
+                    var data = _this.createMessage($(this).val())
+                    sendMessage(data);
                     $(this).val("");
-                    console.log(data);
                     _this.displayMessage(data,true);   
                 }
             }
-        });
-        textinput.focus(function () {
         });
 
         return _this;
