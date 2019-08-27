@@ -42,7 +42,7 @@ io.on('connection', async function (socket) {
     try {
 
         socket.on('start_bot',function (data) { // {header: {account:"",session:""}, message:{}}
-          console.log(socket.id)
+          console.log(socket.id,data)
           if(data.header && data.header.account){
             socket.account = data.header.account;
           }
@@ -50,17 +50,17 @@ io.on('connection', async function (socket) {
           data.header.session = socket.id;
           console.log()
           callApi(endpoint,data).then(res=>{
-            console.log(res.data)
-            socket.emit('send_message',{content:res.data.message});
+            console.log(res)
+            socket.emit('send_message',{content:res.data});
           })
         })
 
         socket.on('request_bot',function (data) { // {header: {account:"",session:""}, message:{}}
           data.header.session = socket.id;
-          console.log(socket.id)
+          console.log(socket.id, data)
           callApi(endpoint,data).then(res=>{
-            console.log(res.data)
-            socket.emit('send_message',{content:res.data.message});
+            console.log(res)
+            socket.emit('send_message',{content:res.data});
           })
         })
 

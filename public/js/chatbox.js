@@ -10,8 +10,9 @@ var ChatBox = function(payload, state, socket) {
                             };
     var _user = {},
         _start = false,
+        MESSAGE_RECEIVER = "supporter_chat",
         MESSAGE_SENDER = "visitor_chat";
-    
+    var this_box = this;
     var _locdau = function(str) {
         str = str.toLowerCase();
         str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
@@ -137,11 +138,10 @@ var ChatBox = function(payload, state, socket) {
             _this.box_head.prepend("<span class=\"online pull-left\"></span>")
         }
     };
-    this.displayMessage = function(message, scroll){
+    this.displayMessage = function(message,){
         var _this = this;
-        if(message.idtemp){
-            console.log(message);
-        }
+        console.log(message);
+        
         // message.time = message.time || new Date() - TIMEOFFSET;
         var date = _formatDate(message.time);
         
@@ -212,17 +212,64 @@ var ChatBox = function(payload, state, socket) {
             }
             _this.messages.splice(indexMessage,0,message);
         }
-        if(scroll){// scroll
-            _this.box_content_chat.scrollTop(10000000000);
-        }else{
-            
-        }
     };
-    this.scrollMessage = function(messageId){ // calculate offset of message in box_content_chat
+    this.displayBotMessageTemplate = function(message){
+        var _this = this;
+        var dom = {};
+        switch(message.type){
+            case 'text':
+                dom = $("<div class=\"line_message\"><div class=\"content_message\">"+message.content+"</div></div>");
+                break;
+            case 'choice':
+                dom = $('<input type="radio" name="gender" value="female"> Tra cứu hồ sơ<br><input type="radio" name="gender" value="other"> Other')
+                break;
+            default:
+                break;
+        }
+        var d = $("<div class=\""+MESSAGE_RECEIVER+"\"></div>");
+        d.append(dom);
+        _this.box_content_chat.append(d);
+    }
+    this.displayBotMessage = function(message){
+        var _this = this;
+        console.log(message)
+        var msgs = JSON.parse(message.content);
+        console.log(msgs+"")
+        message.type = 'text'
+        _this.displayBotMessageTemplate(message)
+        
+
+        // message.dom = $("<div class=\"line_message\"><div class=\"content_message\">"+_showContentMessage(message.content)+"</div></div>");
+        
+
+        
+        
+        // if( indexMessage == -1){ // new message
+        //     if(_.last(_this.messages) && _.last(_this.messages).from == message.from && indexDate !== -1){ 
+        //         _.last(_this.messages).dom.after(message.dom);
+        //     }else{ // index == -1
+        //         // tao 1 domarea message moi
+        //         if(message.from == _user.id){
+        //             var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
+        //             d.append(message.dom);
+        //             _this.box_content_chat.append(d);
+        //         }else{
+        //             var contact = _callback(GET_CONTACT_BY_ID,message.from);
+        //             var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
+        //                         "<div class=\"avatar\">"+
+        //                             "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
+        //                         "</div> </div>");
+        //             d.append(message.dom);
+        //             _this.box_content_chat.append(d);
+        //         }
+        //     }
+        //     _this.messages.push(message);
+        // }
     };
     this.createMessage = function (content) { // 
         var _this = this;
-        return { idtemp: _randomstring(8), content: content};    
+        payload.message = {content}
+        return payload;    
     };
     this.loadMessage = function(messageOld){
         
@@ -237,8 +284,8 @@ var ChatBox = function(payload, state, socket) {
     var _setSocket = function(){
         
         socket.on('send_message', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
-            console.log(data)
-            _this.displayMessage(data);
+            var _this = this;
+            this_box.displayBotMessage(data);
         });
         
     };
@@ -271,6 +318,8 @@ var ChatBox = function(payload, state, socket) {
         });
 
         // MESSSAGE INPUT
+        
+
         var textinput = _this.box_content_input.find("textarea");
         textinput.keydown(function (e) { 
             if (e.keyCode == 13 && e.shiftKey) {
@@ -289,7 +338,17 @@ var ChatBox = function(payload, state, socket) {
                 }
             }
         });
-
+        var btnGui = _this.box_content_input.find("button.btn-submit");
+            btnGui.click(function(e) {
+                e.preventDefault();
+                if (textinput.val() !== '' ) {
+                    var data = _this.createMessage(textinput.val());
+                    sendMessage(data);
+                    textinput.val("");
+                    _this.displayMessage(data,true);   
+                }
+            });
+        _setSocket();
         return _this;
     };
     return this.init();
