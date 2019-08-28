@@ -3,11 +3,21 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const app = express();
-const server = require('http').Server(app);
+
+var fs = require('fs')
+
+var credentials = {
+  key: fs.readFileSync('vnpt.key'),
+  cert: fs.readFileSync('vnpt.crt')
+}
+
+var server = require('https').Server(credentials,app);
+// const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const path = require('path');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
+
 
 
 

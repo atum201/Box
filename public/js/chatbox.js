@@ -238,33 +238,6 @@ var ChatBox = function(payload, state, socket) {
         message.type = 'text'
         _this.displayBotMessageTemplate(message)
         
-
-        // message.dom = $("<div class=\"line_message\"><div class=\"content_message\">"+_showContentMessage(message.content)+"</div></div>");
-        
-
-        
-        
-        // if( indexMessage == -1){ // new message
-        //     if(_.last(_this.messages) && _.last(_this.messages).from == message.from && indexDate !== -1){ 
-        //         _.last(_this.messages).dom.after(message.dom);
-        //     }else{ // index == -1
-        //         // tao 1 domarea message moi
-        //         if(message.from == _user.id){
-        //             var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
-        //             d.append(message.dom);
-        //             _this.box_content_chat.append(d);
-        //         }else{
-        //             var contact = _callback(GET_CONTACT_BY_ID,message.from);
-        //             var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
-        //                         "<div class=\"avatar\">"+
-        //                             "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
-        //                         "</div> </div>");
-        //             d.append(message.dom);
-        //             _this.box_content_chat.append(d);
-        //         }
-        //     }
-        //     _this.messages.push(message);
-        // }
     };
     this.createMessage = function (content) { // 
         var _this = this;
