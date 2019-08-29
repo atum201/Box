@@ -21,9 +21,9 @@
         </style>
     <a href="/2.html">2</a>
         <script type="text/javascript">
-            var socket = io("10.145.37.198:3000");
+            var socket = io("localhost:3000");
             var user = {userId:"vanthuqh@vnpt.vn"};
-            var chatapp = new ChatApp(user,socket,{'server' : '10.145.37.198:3000'});
+            var chatapp = new ChatApp(user,socket,{'server' : 'localhost'});
             $("body").append(chatapp.dom);
 			//socket.on("receive notification",function(data){
 			//	console.log(data)

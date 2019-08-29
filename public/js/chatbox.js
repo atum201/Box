@@ -63,7 +63,6 @@ var ChatBox = function(payload, state, socket) {
     };
 
     var _showContentMessage = function(content){
-        // Show content message
         return content;
     }
     
@@ -138,126 +137,169 @@ var ChatBox = function(payload, state, socket) {
             _this.box_head.prepend("<span class=\"online pull-left\"></span>")
         }
     };
-    this.displayMessage = function(message,){
+
+    this.displayMessage = function(message){
         var _this = this;
-        console.log(message);
+        console.log(message)
+        var d = $("<div class=\""+MESSAGE_SENDER+"\"><div class=\"line_message\">"+
+                "<div class=\"content_message\">"+message+"</div></div></div>");
         
+        _this.box_content_chat.append(d);
+        _this.box_content_chat.scrollTop(10000000000);
+
+
         // message.time = message.time || new Date() - TIMEOFFSET;
-        var date = _formatDate(message.time);
+        // var date = _formatDate(message.time);
         
-        var indexDate = _.findIndex(_this.dates, function(d){
-            return _compareDate(d.date,message.time);
-        });
+        // var indexDate = _.findIndex(_this.dates, function(d){
+        //     return _compareDate(d.date,message.time);
+        // });
 
-        if(indexDate == -1){
-            var dateDom = $("<time class=\"text-right\">"+date+"</time>");
-            if(!_.last(_this.dates) || message.time > _.last(_this.dates).date){  
-                _this.box_content_chat.append(dateDom);
-                _this.dates.push({date:message.time,dom:dateDom});
-            }else{
-                _this.box_content_chat.prepend(dateDom);
-                _this.dates.splice(0,0,{date:message.time,dom:dateDom});
-            }
-        }
+        // if(indexDate == -1){
+        //     var dateDom = $("<time class=\"text-right\">"+date+"</time>");
+        //     if(!_.last(_this.dates) || message.time > _.last(_this.dates).date){  
+        //         _this.box_content_chat.append(dateDom);
+        //         _this.dates.push({date:message.time,dom:dateDom});
+        //     }else{
+        //         _this.box_content_chat.prepend(dateDom);
+        //         _this.dates.splice(0,0,{date:message.time,dom:dateDom});
+        //     }
+        // }
 
-        if(!message.dom){// make dom.
+        // if(!message.dom){// make dom.
 
-            message.dom = $("<div class=\"line_message\"><div class=\"content_message\">"+_showContentMessage(message.content)+"</div></div>");
-            message.dom.dblclick(function(){
-                alert(new Date(message.time));
-            });
-        }
+        //     message.dom = $("<div class=\"line_message\"><div class=\"content_message\">"+_showContentMessage(message.content)+"</div></div>");
+        //     message.dom.dblclick(function(){
+        //         alert(new Date(message.time));
+        //     });
+        // }
         // find index message in messages.
-        var indexMessage = _.findIndex(_this.messages,function(m){
-                                return m.time > message.time;
-                            });
-        if( indexMessage == -1){ // new message
-            if(_.last(_this.messages) && _.last(_this.messages).from == message.from && indexDate !== -1){ 
-                _.last(_this.messages).dom.after(message.dom);
-            }else{ // index == -1
-                // tao 1 domarea message moi
-                if(message.from == _user.id){
-                    var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
-                    d.append(message.dom);
-                    _this.box_content_chat.append(d);
-                }else{
-                    var contact = _callback(GET_CONTACT_BY_ID,message.from);
-                    var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
-                                "<div class=\"avatar\">"+
-                                    "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
-                                "</div> </div>");
-                    d.append(message.dom);
-                    _this.box_content_chat.append(d);
-                }
-            }
-            _this.messages.push(message);
-        }
-        else{ // old message 
-            if(_this.messages[indexMessage].from === message.from && indexDate !== -1){
-                _this.messages[indexMessage].dom.before(message.dom);
-            }else{
-                if(message.from == _user.id){
-                    var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
-                    d.append(message.dom);
-                    _this.dates[0].dom.after(d);
-                }else{
-                    var contact = _callback(GET_CONTACT_BY_ID,message.from);
-                    var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
-                                "<div class=\"avatar\">"+
-                                    "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
-                                "</div> </div>");
-                    d.append(message.dom);
-                    _this.dates[0].dom.after(d);
-                }
-            }
-            _this.messages.splice(indexMessage,0,message);
-        }
+        // var indexMessage = _.findIndex(_this.messages,function(m){
+        //                         return m.time > message.time;
+        //                     });
+        // if( indexMessage == -1){ // new message
+        //     if(_.last(_this.messages) && _.last(_this.messages).from == message.from && indexDate !== -1){ 
+        //         _.last(_this.messages).dom.after(message.dom);
+        //     }else{ // index == -1
+        //         // tao 1 domarea message moi
+        //         // if(message.from == _user.id){
+        //         //     var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
+        //         //     d.append(message.dom);
+        //         //     _this.box_content_chat.append(d);
+        //         // }else{
+        //             var contact = _callback(GET_CONTACT_BY_ID,message.from);
+        //             var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
+        //                         "<div class=\"avatar\">"+
+        //                             "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
+        //                         "</div> </div>");
+        //             d.append(message.dom);
+        //             _this.box_content_chat.append(d);
+        //         // }
+        //     }
+        //     _this.messages.push(message);
+        // }
+        // else{ // old message 
+        //     if(_this.messages[indexMessage].from === message.from && indexDate !== -1){
+        //         _this.messages[indexMessage].dom.before(message.dom);
+        //     }else{
+        //         if(message.from == _user.id){
+        //             var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
+        //             d.append(message.dom);
+        //             _this.dates[0].dom.after(d);
+        //         }else{
+        //             var contact = _callback(GET_CONTACT_BY_ID,message.from);
+        //             var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
+        //                         "<div class=\"avatar\">"+
+        //                             "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
+        //                         "</div> </div>");
+        //             d.append(message.dom);
+        //             _this.dates[0].dom.after(d);
+        //         }
+        //     }
+        //     _this.messages.splice(indexMessage,0,message);
+        // }
     };
-    this.displayBotMessageTemplate = function(message){
+
+    this.displayMessageContent = function(content){
+        var dom = $("<div></div>");
+        if(Array.isArray(content)){
+            
+            content.map(function(c){
+                dom.append($("<p>"+c+"</p>"));    
+                console.log(dom.html());
+            })
+            
+        }else{
+            
+            dom = content;
+        }
+        
+        return dom;
+    }
+
+    this.displayMessageButton = function(template,index,isIndex){
+        
+        var btn = $("<input type=\"button\" class=\"chatai_btn\" value=\""+(isIndex?index+1:template.message.data[index])+"\"\>");
+        btn.css("width",(isIndex?100/template.message.data.length-5:100 )+"%")
+        // var btn = "tesst";
+        btn.on('click',function(){
+            template.message.choice = index;
+            sendMessage(template);
+        })
+        return btn;
+    }   
+
+    this.displayBotMessageTemplate = function(template){
         var _this = this;
-        var dom = {};
+        
+        var message = template.message;
+
+        var dom = $("<div class=\"line_message\"></div>");
         switch(message.type){
             case 'text':
-                dom = $("<div class=\"line_message\"><div class=\"content_message\">"+message.content+"</div></div>");
+                dom.append(_this.displayMessageContent(message.content));
                 break;
             case 'choice':
-                dom = $('<input type="radio" name="gender" value="female"> Tra cứu hồ sơ<br><input type="radio" name="gender" value="other"> Other')
+                var isIndex = false;
+                message.data.map(function(d){
+                    if(!isIndex &&d.length > 50)
+                        isIndex = true;
+                })
+                if(isIndex){
+                    if(!Array.isArray(message.content)){
+                        message.content = [message.content];
+                    }
+                    message.data.map(function(d,i){
+                        message.content.push(i+". "+d);
+                    })
+                }
+                dom.append(_this.displayMessageContent(message.content));
+                message.data.map(function(d,i){
+                    dom.append(_this.displayMessageButton(template,i,isIndex))
+                })
                 break;
             default:
                 break;
         }
-        var d = $("<div class=\""+MESSAGE_RECEIVER+"\"></div>");
-        d.append(dom);
-        _this.box_content_chat.append(d);
+        return dom;
     }
-    this.displayBotMessage = function(message){
+
+    this.displayBotMessage = function(message){ // message = {}
         var _this = this;
-        console.log(message)
-        var msgs = JSON.parse(message.content);
-        console.log(msgs+"")
-        message.type = 'text'
-        _this.displayBotMessageTemplate(message)
-        
+        _this.box_content_chat.append(_this.displayBotMessageTemplate(message));
+        _this.box_content_chat.scrollTop(10000000000);
     };
     this.createMessage = function (content) { // 
         var _this = this;
-        payload.message = {content}
+        payload.message = {"message":{"content":content,"type":"text"}}
         return payload;    
     };
-    this.loadMessage = function(messageOld){
-        
-    };
-    this.updateBox = function(box){
-        var _this = this;
-        _this.box = _.clone(box);
-        _this.box_head.find(".visitor-name").html(_this.box.title);
-        
-    }
     
     var _setSocket = function(){
         
         socket.on('send_message', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
             var _this = this;
+
             this_box.displayBotMessage(data);
         });
         
@@ -287,12 +329,7 @@ var ChatBox = function(payload, state, socket) {
                 _start = true;
                 socket.emit('start_bot',payload);
             }
-            // _callback(CHATBOX_CLOSE);
         });
-
-        // MESSSAGE INPUT
-        
-
         var textinput = _this.box_content_input.find("textarea");
         textinput.keydown(function (e) { 
             if (e.keyCode == 13 && e.shiftKey) {
@@ -305,9 +342,11 @@ var ChatBox = function(payload, state, socket) {
                 e.preventDefault();
                 if ($(this).val() !== '' ) {
                     var data = _this.createMessage($(this).val())
+                    _this.displayMessage($(this).val(),true);   
                     sendMessage(data);
+
                     $(this).val("");
-                    _this.displayMessage(data,true);   
+                    
                 }
             }
         });
@@ -316,9 +355,10 @@ var ChatBox = function(payload, state, socket) {
                 e.preventDefault();
                 if (textinput.val() !== '' ) {
                     var data = _this.createMessage(textinput.val());
+                    _this.displayMessage(textinput.val(),true);   
                     sendMessage(data);
                     textinput.val("");
-                    _this.displayMessage(data,true);   
+                    
                 }
             });
         _setSocket();

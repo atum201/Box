@@ -38,38 +38,73 @@ let callApi = function (
 
 let socker = [];
 
+let start = 0;
+const messages = [
+{
+  "header":{"user":"","session":"","isLogin":""},
+  "message":{"id":"msg_1","content":"Xin chào anh/chị, đây là hệ thống trả lời tự động. Xin vui lòng chọn thông tin anh/chị quan tâm.",
+  "data":["Hướng dẫn tra cứu thủ tục hành chính","Tra cứu tình trạng hồ sơ"],"type":"choice","style":""}},
+{"header":{"user":"","session":"","isLogin":""},
+  "message":{"id":"msg_2","content":["Chúng tôi hỗ trợ 2 dịch vụ:",
+                        "1. Hướng dẫn tra cứu thủ tục hành chính","2. Tra cứu tình trạng hồ sơ","Chúng tôi có thể giúp gì cho bạn"],
+  "data":[],"type":"text","style":""}},
+{"header":{"user":"","session":"","isLogin":""},
+  "message":{"id":"msg_3","content":"Bạn muốn chọn ngành nào?",
+  "data":["Tư pháp","Ngoại giao"],"type":"choice","style":""}},
+{"header":{"user":"","session":"","isLogin":""},
+  "message":{"id":"msg_4","content":"Bạn muốn chọn nhóm Thủ tục hành chính nào",
+  "data":["Yếu tố nước ngoài","Trong nước","khác"],"type":"choice","style":""}},
+{"header":{"user":"","session":"","isLogin":""},
+  "message":{"id":"msg_5","content":"Chúng tôi tìm được một vài kết quả sau:",
+  "data":["Thủ tục đăng ký khai sinh, kết hợp nhận cha, mẹ, con.",
+          "Thủ tục đăng ký khai sinh",
+          "Thủ tục đăng ký khai sinh lưu động",
+          "Thủ tục đăng ký khai sinh cho người đã có hồ sơ, giấy tờ cá nhân"],"type":"choice","style":""}},
+{"header":{"user":"","session":"","isLogin":""},
+  "message":{"id":"msg_5","content":["Anh/chị đã chọn \"Thủ tục đăng ký khai sinh lưu động.\"",
+                                    "Xin vui lòng chọn thông tin anh/chị đang quan tâm về thủ tục?",
+                                    "Để xem CHI TIẾT vui lòng chọn link này []"],
+  "data":["Cơ quan thực hiện","Thành phần hồ sơ","Quy trình thực hiện","Lệ phí","Thời gian thực hiện"],
+  "type":"choice","style":""}}
+]
+
 io.on('connection', async function (socket) {
     try {
 
         socket.on('start_bot',function (data) { // {header: {account:"",session:""}, message:{}}
-          console.log(socket.id,data)
-          if(data.header && data.header.account){
-            socket.account = data.header.account;
-          }
-          socker.push(socket)
-          data.header.session = socket.id;
-          console.log()
-          callApi(endpoint,data).then(res=>{
-            console.log(res)
-            socket.emit('send_message',{content:res.data});
+          
+          start = 0;
+          // if(data.header && data.header.account){
+          //   socket.account = data.header.account;
+          // }
+          // socker.push(socket)
+          // data.header.session = socket.id;
+
+          let d = messages[0]
+
+          callApi(endpoint,d).then(res=>{
+            socket.emit('send_message',res.data);
           })
         })
 
         socket.on('request_bot',function (data) { // {header: {account:"",session:""}, message:{}}
-          data.header.session = socket.id;
-          console.log(socket.id, data)
-          callApi(endpoint,data).then(res=>{
-            console.log(res)
-            socket.emit('send_message',{content:res.data});
+          // data.header.session = socket.id;
+          // let message = data.message;
+          // console.log(message);
+          // let i = _.findIndex(messages,m=>m.message.id===message.id);
+
+          callApi(endpoint,messages[++start]).then(res=>{
+            if(start == 5)
+              start =0;
+            socket.emit('send_message',res.data);
           })
+
         })
 
         socket.on('disconnect', function () {
-          console.log(socket.id," disconnect");
           _.remove(socker,function(sk){
             return sk.id == socket.id
           });
-          console.log(socker.length," disconnect");
         });
 
         socket.on('error', function (error) {
