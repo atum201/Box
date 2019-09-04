@@ -238,12 +238,18 @@ var ChatBox = function(payload, state, socket) {
     }
 
     this.displayMessageButton = function(template,index,isIndex){
-        
-        var btn = $("<input type=\"button\" class=\"chatai_btn\" value=\""+(isIndex?index+1:template.message.data[index])+"\"\>");
+        console.log(template,index,isIndex)
+        var btn = $("<input type=\"button\" class=\"chatai_btn\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
         btn.css("width",(isIndex?100/template.message.data.length-5:100 )+"%")
         // var btn = "tesst";
         btn.on('click',function(){
-            template.message.choice = index;
+            var message = {
+                id:template.message.id,
+                content:template.message.data[index].payload,
+                data:template.message.data,
+                type:template.message.type
+            };
+            var message = {header:template.header,message:message}
             sendMessage(template);
         })
         return btn;
@@ -252,35 +258,39 @@ var ChatBox = function(payload, state, socket) {
     this.displayBotMessageTemplate = function(template){
         var _this = this;
         
-        var message = template.message;
+        var msgs = template.message;
 
         var dom = $("<div class=\"line_message\"></div>");
-        switch(message.type){
-            case 'text':
-                dom.append(_this.displayMessageContent(message.content));
-                break;
-            case 'choice':
-                var isIndex = false;
-                message.data.map(function(d){
-                    if(!isIndex &&d.length > 50)
-                        isIndex = true;
-                })
-                if(isIndex){
-                    if(!Array.isArray(message.content)){
-                        message.content = [message.content];
-                    }
-                    message.data.map(function(d,i){
-                        message.content.push(i+". "+d);
+        msgs.map(function(message){
+            switch(message.type){
+                case 'text':
+                    dom.append(_this.displayMessageContent(message.content));
+                    break;
+                case 'buttons':
+                    var isIndex = false;
+                    message.data.map(function(d){
+                        if(!isIndex &&d.length > 50)
+                            isIndex = true;
                     })
-                }
-                dom.append(_this.displayMessageContent(message.content));
-                message.data.map(function(d,i){
-                    dom.append(_this.displayMessageButton(template,i,isIndex))
-                })
-                break;
-            default:
-                break;
-        }
+                    if(isIndex){
+                        if(!Array.isArray(message.content)){
+                            message.content = [message.content];
+                        }
+                        message.data.map(function(d,i){
+                            message.content.push(i+". "+d);
+                        })
+                    }
+                    dom.append(_this.displayMessageContent(message.content));
+                    message.data.map(function(d,i){
+                        var temp = {header:template.header,message:message}
+                        dom.append(_this.displayMessageButton(temp,i,isIndex))
+                    })
+                    break;
+                default:
+                    break;
+            }
+        })
+        
         return dom;
     }
 
@@ -306,6 +316,7 @@ var ChatBox = function(payload, state, socket) {
     };
 
     var sendMessage = function (data) {
+        console.log(data);
         socket.emit('request_bot', data);
     }
 
