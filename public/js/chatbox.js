@@ -276,7 +276,7 @@ var ChatBox = function(payload, state, socket) {
                             message.content = [message.content];
                         }
                         message.data.map(function(d,i){
-                            message.content.push(i+". "+d);
+                            message.content.push("Câu "+(i+1)+". "+d);
                         })
                     }
                     dom.append(_this.displayMessageContent(message.content));
