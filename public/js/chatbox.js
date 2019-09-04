@@ -238,17 +238,17 @@ var ChatBox = function(payload, state, socket) {
     }
 
     this.displayMessageButton = function(template,index,isIndex){
-        var btn = $("<input type=\"button\" class=\"chatai_btn\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
+        var btn = $("<input type=\"button\" class=\"chatai_btn "+template.message.data[index].payload+"\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
         btn.css("width",(isIndex?100/template.message.data.length-5:100 )+"%")
         // var btn = "tesst";
         btn.on('click',function(){
-            var message = {
+            var m = {
                 id:template.message.id,
                 content:template.message.data[index].payload,
                 data:template.message.data,
                 type:template.message.type
             };
-            var message = {header:template.header,message:message}
+            var message = {header:template.header,message:m}
             sendMessage(template);
         })
         return btn;
