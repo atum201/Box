@@ -268,7 +268,7 @@ var ChatBox = function(payload, state, socket) {
                 case 'buttons':
                     var isIndex = false;
                     message.data.map(function(d){
-                        if(!isIndex &&d.length > 50)
+                        if(!isIndex &&d.text.length > 50)
                             isIndex = true;
                     })
                     if(isIndex){
@@ -276,7 +276,7 @@ var ChatBox = function(payload, state, socket) {
                             message.content = [message.content];
                         }
                         message.data.map(function(d,i){
-                            message.content.push("Câu "+(i+1)+". "+d);
+                            message.content.push("Câu "+(i+1)+". "+d.text);
                         })
                     }
                     dom.append(_this.displayMessageContent(message.content));
