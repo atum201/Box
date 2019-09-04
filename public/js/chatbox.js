@@ -287,6 +287,7 @@ var ChatBox = function(payload, state, socket) {
                     })
                     break;
                 default:
+                    dom.append(_this.displayMessageContent(message.content));
                     break;
             }
         })
@@ -296,8 +297,10 @@ var ChatBox = function(payload, state, socket) {
 
     this.displayBotMessage = function(message){ // message = {}
         var _this = this;
-        _this.box_content_chat.append(_this.displayBotMessageTemplate(message));
-        _this.box_content_chat.scrollTop(10000000000);
+        if(message.message.length > 0){
+            _this.box_content_chat.append(_this.displayBotMessageTemplate(message));
+            _this.box_content_chat.scrollTop(10000000000);    
+        }
     };
     this.createMessage = function (content) { // 
         var _this = this;

@@ -38,7 +38,6 @@ let callApi = function (
 
 let socker = [];
 
-console.log(323123);
 io.on('connection', async function (socket) {
     try {
 
