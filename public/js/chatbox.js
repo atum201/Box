@@ -312,6 +312,7 @@ var ChatBox = function(payload, state, socket) {
         socket.on('send_message', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
             var _this = this;
             payload.header = data.header;
+            console.log(data);
             this_box.displayBotMessage(data);
         });
         
