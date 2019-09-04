@@ -23,7 +23,6 @@ let callApi = function (
   endpoint,
   data = null
 ) {
-  console.log(322323232323)
   return axios({
     method: "POST",
     url: endpoint,
@@ -42,7 +41,7 @@ io.on('connection', async function (socket) {
     try {
 
         socket.on('start_bot',function (data) { // {header: {account:"",session:""}, message:{}}
-          console.log('3213123',data)
+          console.log('start_bot',data)
           // start = 0;
           // if(data.header && data.header.account){
           //   socket.account = data.header.account;
@@ -53,17 +52,17 @@ io.on('connection', async function (socket) {
           // let d = messages[0]
 
           callApi(endpoint,data).then(res=>{
-            console.log(res.data);
+            console.log('start_bot',res.data);
             socket.emit('send_message',res.data);
           })
         })
 
         socket.on('request_bot',function (data) { // {header: {account:"",session:""}, message:{}}
-          console.log(data);
+          console.log('request_bot',data);
           callApi(endpoint,data).then(res=>{
             // if(start == 5)
             //   start =0;
-            console.log(res.data);
+            console.log('request_bot response',res.data);
             socket.emit('send_message',res.data);
           })
 

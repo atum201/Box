@@ -238,7 +238,6 @@ var ChatBox = function(payload, state, socket) {
     }
 
     this.displayMessageButton = function(template,index,isIndex){
-        console.log(template,index,isIndex)
         var btn = $("<input type=\"button\" class=\"chatai_btn\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
         btn.css("width",(isIndex?100/template.message.data.length-5:100 )+"%")
         // var btn = "tesst";
