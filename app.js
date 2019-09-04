@@ -59,12 +59,7 @@ io.on('connection', async function (socket) {
         })
 
         socket.on('request_bot',function (data) { // {header: {account:"",session:""}, message:{}}
-          // data.header.session = socket.id;
-          // let message = data.message;
-          // console.log(message);
-          // let i = _.findIndex(messages,m=>m.message.id===message.id);
-
-          // callApi(endpoint,messages[++start]).then(res=>{
+          console.log(data);
           callApi(endpoint,data).then(res=>{
             // if(start == 5)
             //   start =0;
