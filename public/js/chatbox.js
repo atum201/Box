@@ -303,7 +303,7 @@ var ChatBox = function(payload, state, socket) {
     };
     this.createMessage = function (content) { // 
         var _this = this;
-        payload.message = {"message":{"id":"","content":content,"type":"","data":[]}}
+        payload.message = {"id":"","content":content,"type":"","data":[]}
         return payload;    
     };
     
