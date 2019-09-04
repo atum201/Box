@@ -248,9 +248,8 @@ var ChatBox = function(payload, state, socket) {
                 data:template.message.data,
                 type:template.message.type
             };
-            console.log(m,template.message.data[index].payload);
             var message = {header:template.header,message:m}
-            sendMessage(template);
+            sendMessage(message);
         })
         return btn;
     }   
