@@ -303,7 +303,7 @@ var ChatBox = function(payload, state, socket) {
     };
     this.createMessage = function (content) { // 
         var _this = this;
-        payload.message = {"message":{"content":content,"type":"text"}}
+        payload.message = {"message":{id:"",content":content,"type":"",data:[]}}
         return payload;    
     };
     
@@ -311,7 +311,7 @@ var ChatBox = function(payload, state, socket) {
         
         socket.on('send_message', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
             var _this = this;
-
+            payload.header = data.header;
             this_box.displayBotMessage(data);
         });
         
