@@ -1,4 +1,3 @@
-var _dom = $("<div id='chatapp' class='chat-app'></div>");
 var ChatBox = function(payload, state, socket) {
     this.box = {}; // {id:"",type:"group|user",title:"",member:[]}
     this.state = state ||   {
@@ -380,3 +379,8 @@ var ChatBox = function(payload, state, socket) {
     };
     return this.init();
 };
+
+var socket = io('https://chatai.vnpt.vn/');
+var payload = {header:{account:"noname"},message:{content:"hello"}};
+var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi.'$user'"},socket);
+$("body").append(chatapp.dom);
