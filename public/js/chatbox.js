@@ -237,7 +237,7 @@ var ChatBox = function(payload, state, socket) {
     }
 
     this.displayMessageButton = function(template,index,isIndex){
-        var btn = $("<input type=\"button\" class=\"btn btn-primary "+template.message.data[index].payload+"\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
+        var btn = $("<input type=\"button\" class=\"chatai_btn "+template.message.data[index].payload+"\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
         if(template.message.style.vertical||isIndex){
             btn.css("margin","2px 7px 3px 0px")    
         }else{
