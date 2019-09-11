@@ -386,7 +386,7 @@ var ChatBox = function(payload, state, socket) {
     return this.init();
 };
 
-var socket = io('/');
+var socket = io('https://chatai.vnpt.vn/');
 var payload = {header:{account:"noname"},message:{content:"hello"}};
 var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket);
 $("body").append(chatapp.dom);
