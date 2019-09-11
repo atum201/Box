@@ -1,4 +1,4 @@
-var ChatBox = function(payload, state, socket) {
+var ChatBox = function(payload, state, socket, start) {
     this.box = {}; // {id:"",type:"group|user",title:"",member:[]}
     this.state = state ||   {
                                 show:true,
@@ -387,6 +387,16 @@ var ChatBox = function(payload, state, socket) {
 };
 
 var socket = io('https://chatai.vnpt.vn/');
-var payload = {header:{account:"noname"},message:{content:"hello"}};
-var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket);
+var userSession = sessionStorage.getItem("chatai");
+var start = false;
+if(!userSession){
+    userSession = Math.random().toString(36).substr(2, 5);
+    start = true;
+    sessionStorage.setItem("chatai", userSession);    
+}else{
+
+}
+console.log(userSession)
+var payload = {header:{user:userSession},message:{content:start?"hello":"/get_history_msg"}};
+var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket,start);
 $("body").append(chatapp.dom);
