@@ -139,7 +139,6 @@ var ChatBox = function(payload, state, socket, start) {
 
     this.displayMessage = function(message){
         var _this = this;
-        console.log(message)
         var d = $("<div class=\""+MESSAGE_SENDER+"\"><div class=\"line_message\">"+
                 "<div class=\"content_message\">"+message+"</div></div></div>");
         
@@ -289,6 +288,10 @@ var ChatBox = function(payload, state, socket, start) {
                         var temp = {header:template.header,message:message}
                         dom.append(_this.displayMessageButton(temp,i,isIndex))
                     })
+                    dom.append("<br/>")
+                    break;
+                case 'user':
+                    _this.displayMessage(message.content,true);   
                     break;
                 default:
                     dom.append(_this.displayMessageContent(message.content));
@@ -385,18 +388,45 @@ var ChatBox = function(payload, state, socket, start) {
     };
     return this.init();
 };
+var start = false;
+function setCookie(cname,cvalue,exmis) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exmis*60*1000));
+  var expires = "expires=" + d.toGMTString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function getChatAICookie(name) {
+  var user=getCookie(name);
+  if (user != "") {
+    return user;
+  } else {
+    start = true;
+    user = Math.random().toString(36).substr(2, 5); 
+    setCookie(name, user, 10);
+    return user;
+  }
+}
 
 var socket = io('https://chatai.vnpt.vn/');
-var userSession = sessionStorage.getItem("chatai");
-var start = false;
-if(!userSession){
-    userSession = Math.random().toString(36).substr(2, 5);
-    start = true;
-    sessionStorage.setItem("chatai", userSession);    
-}else{
-
-}
+var userSession = getChatAICookie("chatai");
 console.log(userSession)
-var payload = {header:{user:userSession},message:{content:start?"hello":"/get_history_msg"}};
+var payload = {header:{user:userSession},message:{content:start?"/start":"/get_history_msg"}};
 var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket,start);
 $("body").append(chatapp.dom);
