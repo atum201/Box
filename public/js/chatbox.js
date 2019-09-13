@@ -144,78 +144,6 @@ var ChatBox = function(payload, state, socket, start) {
         
         _this.box_content_chat.append(d);
         _this.box_content_chat.scrollTop(10000000000);
-
-
-        // message.time = message.time || new Date() - TIMEOFFSET;
-        // var date = _formatDate(message.time);
-        
-        // var indexDate = _.findIndex(_this.dates, function(d){
-        //     return _compareDate(d.date,message.time);
-        // });
-
-        // if(indexDate == -1){
-        //     var dateDom = $("<time class=\"text-right\">"+date+"</time>");
-        //     if(!_.last(_this.dates) || message.time > _.last(_this.dates).date){  
-        //         _this.box_content_chat.append(dateDom);
-        //         _this.dates.push({date:message.time,dom:dateDom});
-        //     }else{
-        //         _this.box_content_chat.prepend(dateDom);
-        //         _this.dates.splice(0,0,{date:message.time,dom:dateDom});
-        //     }
-        // }
-
-        // if(!message.dom){// make dom.
-
-        //     message.dom = $("<div class=\"line_message\"><div class=\"content_message\">"+_showContentMessage(message.content)+"</div></div>");
-        //     message.dom.dblclick(function(){
-        //         alert(new Date(message.time));
-        //     });
-        // }
-        // find index message in messages.
-        // var indexMessage = _.findIndex(_this.messages,function(m){
-        //                         return m.time > message.time;
-        //                     });
-        // if( indexMessage == -1){ // new message
-        //     if(_.last(_this.messages) && _.last(_this.messages).from == message.from && indexDate !== -1){ 
-        //         _.last(_this.messages).dom.after(message.dom);
-        //     }else{ // index == -1
-        //         // tao 1 domarea message moi
-        //         // if(message.from == _user.id){
-        //         //     var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
-        //         //     d.append(message.dom);
-        //         //     _this.box_content_chat.append(d);
-        //         // }else{
-        //             var contact = _callback(GET_CONTACT_BY_ID,message.from);
-        //             var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
-        //                         "<div class=\"avatar\">"+
-        //                             "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
-        //                         "</div> </div>");
-        //             d.append(message.dom);
-        //             _this.box_content_chat.append(d);
-        //         // }
-        //     }
-        //     _this.messages.push(message);
-        // }
-        // else{ // old message 
-        //     if(_this.messages[indexMessage].from === message.from && indexDate !== -1){
-        //         _this.messages[indexMessage].dom.before(message.dom);
-        //     }else{
-        //         if(message.from == _user.id){
-        //             var d = $("<div class=\""+MESSAGE_SENDER+"\"></div>");
-        //             d.append(message.dom);
-        //             _this.dates[0].dom.after(d);
-        //         }else{
-        //             var contact = _callback(GET_CONTACT_BY_ID,message.from);
-        //             var d = $("<div class=\""+MESSAGE_RECEIVER+"\">"+
-        //                         "<div class=\"avatar\">"+
-        //                             "<img src=\""+(contact.avatar || AVATAR_DEFAULT)+"\">"+
-        //                         "</div> </div>");
-        //             d.append(message.dom);
-        //             _this.dates[0].dom.after(d);
-        //         }
-        //     }
-        //     _this.messages.splice(indexMessage,0,message);
-        // }
     };
 
     this.displayMessageContent = function(content){
@@ -290,7 +218,7 @@ var ChatBox = function(payload, state, socket, start) {
                     })
                     dom.append("<br/>")
                     break;
-                case 'user':
+                case 'USER':
                     _this.displayMessage(message.content,true);   
                     break;
                 default:
