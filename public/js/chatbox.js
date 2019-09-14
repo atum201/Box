@@ -119,6 +119,7 @@ var ChatBox = function(payload, state, socket, reload) {
     this.dates = []; // {date: "", dom: $};
     this._typeEmoticon = "";
     this.setState = function(state){ // set state for object.
+
         var _this = this;
         _this.state = _.assign(_this.state,state);
         _this.dom.removeClass("hidden");
@@ -251,14 +252,13 @@ var ChatBox = function(payload, state, socket, reload) {
         socket.on('send_message', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
             var _this = this;
             payload.header = data.header;
-            console.log(data);
             this_box.displayBotMessage(data);
         });
         
     };
 
     var sendMessage = function (data) {
-        console.log(data);
+        // console.log(data);
         socket.emit('request_bot', data);
     }
 
@@ -277,9 +277,7 @@ var ChatBox = function(payload, state, socket, reload) {
 
         btnToggle.on('click',function(){
             _this.state.full = _this.state.full == false;
-
-            setCookie('box_state',_this.state.full,10);
-
+            setCookie('box_state',_this.state.full?1:0,10);
             _this.setState();
             if(!_start){
                 _start = true;
@@ -288,9 +286,8 @@ var ChatBox = function(payload, state, socket, reload) {
         });
 
         var box_state = getCookie('box_state');
-        console.log(box_state);
         if(box_state){
-            _this.state.full = box_state;
+            _this.state.full = box_state==1;
             _this.setState();
         }
 
@@ -329,7 +326,6 @@ var ChatBox = function(payload, state, socket, reload) {
                     
                 }
             });
-        console.log(getCookie);
         _setSocket();
         return _this;
     };
@@ -376,7 +372,6 @@ function getChatAICookie(name) {
 var socket = io('https://chatai.vnpt.vn/');
 var userSession = getChatAICookie("chatai");
 
-console.log(userSession)
 var payload = {header:{user:userSession},message:{content:reload==0?"/start":"/get_history_msg"}};
 var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket,reload);
 $("body").append(chatapp.dom);
