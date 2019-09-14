@@ -1,4 +1,4 @@
-var ChatBox = function(payload, state, socket, start) {
+var ChatBox = function(payload, state, socket, reload) {
     this.box = {}; // {id:"",type:"group|user",title:"",member:[]}
     this.state = state ||   {
                                 show:true,
@@ -8,7 +8,7 @@ var ChatBox = function(payload, state, socket, start) {
                                 title:"Hãy chat với chúng tôi",
                             };
     var _user = {},
-        _start = false,
+        _start = reload == 1,
         MESSAGE_RECEIVER = "supporter_chat",
         MESSAGE_SENDER = "visitor_chat";
     var this_box = this;
@@ -147,12 +147,11 @@ var ChatBox = function(payload, state, socket, start) {
     };
 
     this.displayMessageContent = function(content){
-        var dom = $("<div></div>");
+        var dom = $("<div class=\"line_message\"></div>");
         if(Array.isArray(content)){
             
             content.map(function(c){
                 dom.append($("<p>"+c+"</p>"));    
-                console.log(dom.html());
             })
             
         }else{
@@ -165,10 +164,11 @@ var ChatBox = function(payload, state, socket, start) {
 
     this.displayMessageButton = function(template,index,isIndex){
         var btn = $("<input type=\"button\" class=\"chatai_btn "+template.message.data[index].payload+"\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
-        if(template.message.style.vertical||isIndex){
+        if((template.message.style&&template.message.style.vertical)||isIndex){
             btn.css("margin","2px 7px 3px 0px")    
         }else{
             btn.css("width","100%")    
+            btn.css("margin","2px 7px 3px 0px")    
         }
         
         // var btn = "tesst";
@@ -189,12 +189,12 @@ var ChatBox = function(payload, state, socket, start) {
         var _this = this;
         
         var msgs = template.message;
-
-        var dom = $("<div class=\"line_message\"></div>");
+        
+        var dom = [];$("<div class=\"line_message\"></div>");
         msgs.map(function(message){
             switch(message.type){
                 case 'text':
-                    dom.append(_this.displayMessageContent(message.content));
+                    dom.push(_this.displayMessageContent(message.content));
                     break;
                 case 'buttons':
                     var isIndex = false;
@@ -210,19 +210,22 @@ var ChatBox = function(payload, state, socket, start) {
                             message.content.push("Câu "+(i+1)+". "+d.text);
                         })
                     }
-                    dom.append(_this.displayMessageContent(message.content));
-                    dom.append("<br/>")
+                    dom.push(_this.displayMessageContent(message.content));
+
+                    var dbtn = $("<div class=\"line_message\"></div>");
                     message.data.map(function(d,i){
                         var temp = {header:template.header,message:message}
-                        dom.append(_this.displayMessageButton(temp,i,isIndex))
+                        dbtn.append(_this.displayMessageButton(temp,i,isIndex))
                     })
-                    dom.append("<br/>")
+                    dom.push(dbtn);
                     break;
                 case 'USER':
-                    _this.displayMessage(message.content,true);   
+                    dom.push("<div class=\""+MESSAGE_SENDER+"\"><div class=\"line_message\">"+
+                "<div class=\"content_message\">"+message.content+"</div></div></div>");
+                    // dom.append("<div class=\"content_message\">"+message.content+"</div>");
                     break;
                 default:
-                    dom.append(_this.displayMessageContent(message.content));
+                    dom.push(_this.displayMessageContent(message.content));
                     break;
             }
         })
@@ -274,12 +277,27 @@ var ChatBox = function(payload, state, socket, start) {
 
         btnToggle.on('click',function(){
             _this.state.full = _this.state.full == false;
+
+            setCookie('box_state',_this.state.full,10);
+
             _this.setState();
             if(!_start){
                 _start = true;
                 socket.emit('start_bot',payload);
             }
         });
+
+        var box_state = getCookie('box_state');
+        console.log(box_state);
+        if(box_state){
+            _this.state.full = box_state;
+            _this.setState();
+        }
+
+        if(reload === 1){
+            socket.emit('start_bot',payload);
+        }
+
         var textinput = _this.box_content_input.find("textarea");
         textinput.keydown(function (e) { 
             if (e.keyCode == 13 && e.shiftKey) {
@@ -311,12 +329,13 @@ var ChatBox = function(payload, state, socket, start) {
                     
                 }
             });
+        console.log(getCookie);
         _setSocket();
         return _this;
     };
     return this.init();
 };
-var start = false;
+var reload = 0;
 function setCookie(cname,cvalue,exmis) {
   var d = new Date();
   d.setTime(d.getTime() + (exmis*60*1000));
@@ -342,19 +361,22 @@ function getCookie(cname) {
 
 function getChatAICookie(name) {
   var user=getCookie(name);
+
   if (user != "") {
+    reload = 1;
     return user;
   } else {
-    start = true;
+    reload = 0;
     user = Math.random().toString(36).substr(2, 5); 
     setCookie(name, user, 10);
     return user;
   }
 }
 
-var socket = io('https://chatai.vnpt.vn/');
+var socket = io('/');
 var userSession = getChatAICookie("chatai");
+
 console.log(userSession)
-var payload = {header:{user:userSession},message:{content:start?"/start":"/get_history_msg"}};
-var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket,start);
+var payload = {header:{user:userSession},message:{content:reload==0?"/start":"/get_history_msg"}};
+var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket,reload);
 $("body").append(chatapp.dom);

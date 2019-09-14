@@ -42,14 +42,6 @@ io.on('connection', async function (socket) {
 
         socket.on('start_bot',function (data) { // {header: {account:"",session:""}, message:{}}
           console.log('start_bot',data)
-          // start = 0;
-          // if(data.header && data.header.account){
-          //   socket.account = data.header.account;
-          // }
-          // socker.push(socket)
-          // data.header.session = socket.id;
-
-          // let d = messages[0]
 
           callApi(endpoint,data).then(res=>{
             console.log('start_bot',res.data);
