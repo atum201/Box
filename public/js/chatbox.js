@@ -373,7 +373,7 @@ function getChatAICookie(name) {
   }
 }
 
-var socket = io('/');
+var socket = io('https://chatai.vnpt.vn/');
 var userSession = getChatAICookie("chatai");
 
 console.log(userSession)
