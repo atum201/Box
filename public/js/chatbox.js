@@ -1,16 +1,8 @@
 var ChatBox = function(payload, state, socket, reload) {
     this.box = {}; // {id:"",type:"group|user",title:"",member:[]}
-    this.state = state ||   {
-                                show:true,
-                                full:true,
-                                online:false,
-                                new:0,
-                                title:"Hãy chat với chúng tôi",
-                            };
+    this.state = state ||   {show:false };
     var _user = {},
-        _start = reload == 1,
-        MESSAGE_RECEIVER = "supporter_chat",
-        MESSAGE_SENDER = "visitor_chat";
+        _start = reload == 1;
     var this_box = this;
     var _locdau = function(str) {
         str = str.toLowerCase();
@@ -35,144 +27,73 @@ var ChatBox = function(payload, state, socket, reload) {
         while (s.length < L) s += randomchar();
         return s;
     };
-    var _formatDate = function(date) {
-        date = typeof date === 'number' ? new Date(date) : date;
-        var ngay = ["Ch&#7911; nh&#7853;t", "Th&#7913; hai", "Th&#7913; ba", "Th&#7913; t&#432;", "Th&#7913; n&#259;m", "Th&#7913; s&aacute;u", "Th&#7913; b&#7843;y"];
-        date = date||new Date();
-        return ngay[date.getDay()] + ", ng&agrave;y " + date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-    };
-    var _compareDate = function(d,d2){
-        d = typeof d === 'number' ? new Date(d) : d;
-        d2 = typeof d2 === 'number' ? new Date(d2) : d2;
-        if(d && d2)
-            return d.toDateString() === d2.toDateString();
-        return true;
-    };
-    var _localStorage = function(key,object){
-        if(!localStorage)
-            localStorage = {};
-        localStorage[key] = JSON.stringify(object);
-    };
-    var _get_localStorage = function(key){
-        if(!localStorage)
-            localStorage = {};
-        if(STORAGE_RESET && localStorage[key])
-            return JSON.parse(localStorage[key]);
-        return undefined;
-    };
 
     var _showContentMessage = function(content){
         return content;
     }
-    
-
-
-    this.box_head = $("<div class=\"live-hd\">"+
-                            "<div class=\"pull-left visitor-name\">"+this.state.title+"</div>"+
-                            "<div class=\"pull-right\">"+
-                                "<a href=\"javascript:void(0)\" class=\"btnclose-min\"><i class=\"fa fa-chevron-down\"></i><i class=\"fa fa-chevron-up\"></i></a>"+
+    this.box_head = $("<div class=\"vs-chat-heading\">"+
+                        "<div class=\"top\">"+
+                            "<div class=\"name\">"+
+                                "<div class=\"avatar\" style=\"background-image: url(img/chat/customer-support.svg);\">"+
+                                "</div>"+
+                                "<span class=\"title\">Trợ lý thông minh</span>"+
+                                "<span class=\"txt\">Hãy để tôi hỗ trợ bạn</span>"+
                             "</div>"+
-                            "<div class=\"clearfix\"></div>"+
-                        "</div>");
-    this.box_content_top = $("<div class=\"live-ct-top\"></div>");
-    this.btn_add_contact = $("<a href=\"javascript:void(0)\"><i class=\"fa fa-plus fa-lg\"></i></a>");
-    this.btn_info_contact = $("<a href=\"javascript:void(0)\"><i class=\"fa fa-info fa-lg\"></i></a>");
-    this.btn_minus_contact = $("<a href=\"javascript:void(0)\"><i class=\"fa fa-minus fa-lg\"></i></a>");
-    this.btn_leave_group = $("<a href=\"javascript:void(0)\"><i class=\"fa fa-sign-out fa-lg\"></i></a>");
-    this.btn_remove_group = $("<a href=\"javascript:void(0)\"><i class=\"fa fa-remove fa-lg\"></i></a>");
-    this.box_content_search = $("<div class=\"live-search\">"+
-                                    "<i class=\"fa fa-search\"></i>"+
-                                    "<input type=\"text\" placeholder=\"T&igrave;m ki&#7871;m\">"+
-                                "</div>");
-    this.box_content_emoticon = $("<div class=\"live-emoticon\"></div>");
-    this.emoticon_box = $("<div class=\"emoticon-box\">"+
-                            "<div class=\"box-detail\"><span class=\"shortcut\"/></div>"+
-                            "<div class=\"box-list\"></div>"+
-                        "</div>");
-    this.box_content_input = $("<div class=\"live-chat-ft\">"+
-                                    "<div class=\"textarea\">"+
-                                        "<textarea placeholder=\"Nh&#7853;p n&#7897;i dung\"></textarea>"+
-                                    "</div>"+
-                                    "<button class=\"btn btn-submit\">G&#7917;i</button>"+
-                                    "<a href=\"javascript:void(0)\" class=\"btn btn-attach\" title=\"&#272;&iacute;nh k&egrave;m file\"><i class=\"fa fa-paperclip fa-lg\"></i></a>"+
-                                    "<input type=\"file\" class=\"fu\" style=\"display:none\" name=\"fileattach\" multiple/>"+
-                                "</div>");
-    this.box_content = $("<div class=\"live-ct\"></div>");
-    this.box_content_chat = $("<div class=\"live-chat\"></div>");
-    this.box_group_add_user = $("<div class=\"content-adduser\">"+
-                                    "<a href=\"javascript:void(0)\" class=\"btn-creategroup\"><i class=\"fa fa-check fa-lg ga\"></i></a>"+
-                                    "<a href=\"javascript:void(0)\" class=\"btn-refresh\"><i class=\"fa fa-refresh fa-lg ga\"></i></a>"+
-                                    "<a href=\"javascript:void(0)\" class=\"btn-cancel\"><i class=\"fa fa-close fa-lg ga\"></i></a>"+
-                                    "<a href=\"javascript:void(0)\" class=\"btn-add\"><i class=\"fa fa-group fa-lg\"></i></a>"+
-                                    "<div class=\"content\">"+
-                                        "<div class=\"select-box\">"+
-                                            "<select class=\"js-multiple\" data-placeholder=\"Th&ecirc;m th&agrave;nh vi&ecirc;n...\" multiple tabindex=\"3\"></select>"+
-                                        "</div>"+
-                                    "</div>"+
-                                "</div>");
-    this.wrap = $("<div class=\"chat-box\"></div>");
-    this.dom = $("<div class=\"chat-div\"></div>");
-
+                            "<div class=\"actions\">"+
+                                "<a class=\"btn btn-close -ap icon-cross3\"></a>"+
+                            "</div>"+
+                        "</div>"+
+                    "</div>")
+    this.box_content = $("<div  class=\"vs-content-chat\" id=\"listbotchat\"></div>");
+    this.box_content_wrap =  $("<div class=\"mess-box\"></div>");
+    this.box_content_chat = $("<div class=\"content-chat-box\"></div>");
+    this.box_content_input = $("<div class=\"bottom-chat\">"+
+                "<div class=\"input-chat\">"+
+                    "<textarea class=\"form-control\" placeholder=\"Nhập tin nhắn...\"></textarea> "+
+                "</div>"+
+            "</div>");
+    this.wrap = $("<div class=\"vs-chat-popup -mess\"></div>");
+    this.dom = $("<div class='chat-div'>"+
+                    "<div class=\"vs-icon-chat\">"+
+                        "<img src=\"img/chat/customer-support.svg\">"+
+                    "</div>"+
+                "</div>");
 
     this.search_btnRefresh = {};
     this.messages = [];// { from: _user.id, toGroup: _this.box.id, content: content };
     this.dates = []; // {date: "", dom: $};
-    this._typeEmoticon = "";
+    
     this.setState = function(state){ // set state for object.
 
         var _this = this;
         _this.state = _.assign(_this.state,state);
-        _this.dom.removeClass("hidden");
-        if(_this.state.show == false){
-            _this.dom.addClass("hidden");
-        }
-        _this.box_content.removeClass("in");
-        _this.box_head.find(".btnclose-min").removeClass("open");
-        if(_this.state.full){
-            _this.box_content.addClass("in");
-            _this.box_head.find(".btnclose-min").addClass("open");
-        };
-        _this.box_head.find(".online").remove();
-        if(_this.state.online){
-            _this.box_head.prepend("<span class=\"online pull-left\"></span>")
+        
+        var vs = _this.dom.find('.vs-icon-chat');
+
+        if(_this.state.show){
+            vs.addClass("hide-vs");
+            _this.wrap.addClass("show");
+        }else{
+            vs.removeClass("hide-vs");
+            _this.wrap.removeClass("show");
         }
     };
-
     this.displayMessage = function(message){
         var _this = this;
-        var d = $("<div class=\""+MESSAGE_SENDER+"\"><div class=\"line_message\">"+
-                "<div class=\"content_message\">"+message+"</div></div></div>");
-        
-        _this.box_content_chat.append(d);
-        _this.box_content_chat.scrollTop(10000000000);
+        var last_content = _this.box_content_chat.find(".mess-item:last-child");
+        if(last_content.hasClass("-you")){
+            last_content.find(".mess-content").append('<div class="mess">'+message+'</div>');
+        }else{
+            _this.box_content_chat.append("<div class=\"mess-item -you\">"+
+                        "<div class=\"mess-content\">"+
+                            "<div class=\"mess\">"+message+"</div>"+
+                        "</div>"+
+                    "</div>")
+        }
+        _this.box_content_wrap.scrollTop(10000000000);
     };
-
-    this.displayMessageContent = function(content){
-        var dom = $("<div class=\"line_message\"></div>");
-        if(Array.isArray(content)){
-            
-            content.map(function(c){
-                dom.append($("<p>"+c+"</p>"));    
-            })
-            
-        }else{
-            
-            dom = content;
-        }
-        
-        return dom;
-    }
-
-    this.displayMessageButton = function(template,index,isIndex){
-        var btn = $("<input type=\"button\" class=\"chatai_btn "+template.message.data[index].payload+"\" value=\""+(isIndex?index+1:template.message.data[index].text)+"\"\>");
-        if((template.message.style&&template.message.style.vertical)||isIndex){
-            btn.css("margin","2px 7px 3px 0px")    
-        }else{
-            btn.css("width","100%")    
-            btn.css("margin","2px 7px 3px 0px")    
-        }
-        
-        // var btn = "tesst";
+    this.displayMessageButton = function(template,index){
+        var btn = $("<div class=\"btn\">"+template.message.data[index].text+"</div>");
         btn.on('click',function(){
             var m = {
                 id:template.message.id,
@@ -184,61 +105,74 @@ var ChatBox = function(payload, state, socket, reload) {
             sendMessage(message);
         })
         return btn;
-    }   
-
+    }
     this.displayBotMessageTemplate = function(template){
         var _this = this;
-        
         var msgs = template.message;
-        
-        var dom = [];$("<div class=\"line_message\"></div>");
+        var dom = [];
+        var temp = {};
+        var t_temp = 'start';
         msgs.map(function(message){
             switch(message.type){
-                case 'text':
-                    dom.push(_this.displayMessageContent(message.content));
-                    break;
                 case 'buttons':
-                    var isIndex = false;
-                    message.data.map(function(d){
-                        if(!isIndex &&d.text.length > 50)
-                            isIndex = true;
-                    })
-                    if(isIndex){
-                        if(!Array.isArray(message.content)){
-                            message.content = [message.content];
-                        }
-                        message.data.map(function(d,i){
-                            message.content.push("Câu "+(i+1)+". "+d.text);
-                        })
+                    if(t_temp == 'USER'){
+                        dom.push(temp);
+                        temp = $("<div class=\"mess-item -me\">"+
+                                    "<div class=\"avatar\" style=\"background-image: url("+chat_host+"img/chat/customer-support.svg);\">"+
+                                    "</div><div class=\"mess-content\"></div></div>");
+                        t_temp = 'Bot';
                     }
-                    dom.push(_this.displayMessageContent(message.content));
-
-                    var dbtn = $("<div class=\"line_message\"></div>");
+                    if(t_temp == 'start'){
+                        temp = $("<div class=\"mess-item -me\">"+
+                                    "<div class=\"avatar\" style=\"background-image: url("+chat_host+"img/chat/customer-support.svg);\">"+
+                                    "</div><div class=\"mess-content\"></div></div>");
+                        t_temp = 'Bot';
+                    }
+                    temp.find('.mess-content').append("<div class=\"mess\">"+message.content+"</div>");
+                    temp.find('.mess-content').append("<br/>");
                     message.data.map(function(d,i){
-                        var temp = {header:template.header,message:message}
-                        dbtn.append(_this.displayMessageButton(temp,i,isIndex))
+                        var t = {header:template.header,message:message}
+                        temp.find('.mess-content').append(_this.displayMessageButton(t,i));
                     })
-                    dom.push(dbtn);
+                    t_temp = "Bot";
                     break;
                 case 'USER':
-                    dom.push("<div class=\""+MESSAGE_SENDER+"\"><div class=\"line_message\">"+
-                "<div class=\"content_message\">"+message.content+"</div></div></div>");
-                    // dom.append("<div class=\"content_message\">"+message.content+"</div>");
+                    if(t_temp != 'USER'){// tin nhan trc do la cua bot
+                        if(t_temp != 'start') dom.push(temp);
+                        temp = $("<div class=\"mess-item -you\">"+
+                                        "<div class=\"mess-content\"></div></div>");
+                        t_temp = 'USER';
+                    }
+
+                    temp.find('.mess-content').append("<div class=\"mess\">"+message.content+"</div>")
+                    t_temp = 'USER';
                     break;
                 default:
-                    dom.push(_this.displayMessageContent(message.content));
+                    if(t_temp == 'USER'){
+                        dom.push(temp);
+                        temp = $("<div class=\"mess-item -me\">"+
+                                    "<div class=\"avatar\" style=\"background-image: url("+chat_host+"img/chat/customer-support.svg);\">"+
+                                    "</div><div class=\"mess-content\"></div></div>");
+                        t_temp = 'Bot';
+                    }
+                    if(t_temp == 'start'){
+                        temp = $("<div class=\"mess-item -me\">"+
+                                    "<div class=\"avatar\" style=\"background-image: url("+chat_host+"img/chat/customer-support.svg);\">"+
+                                    "</div><div class=\"mess-content\"></div></div>");
+                        t_temp = 'Bot';
+                    }
+                    temp.find('.mess-content').append("<div class=\"mess\">"+message.content+"</div>")
                     break;
             }
         })
-        
+        dom.push(temp);
         return dom;
     }
-
     this.displayBotMessage = function(message){ // message = {}
         var _this = this;
         if(message.message.length > 0){
             _this.box_content_chat.append(_this.displayBotMessageTemplate(message));
-            _this.box_content_chat.scrollTop(10000000000);    
+            _this.box_content_wrap.scrollTop(10000000000);    
         }
     };
     this.createMessage = function (content) { // 
@@ -246,9 +180,7 @@ var ChatBox = function(payload, state, socket, reload) {
         payload.message = {"id":"","content":content,"type":"","data":[]}
         return payload;    
     };
-    
     var _setSocket = function(){
-        
         socket.on('send_message', function (data) { // data: message. nhan 1 tin nhan truc tuyen.
             var _this = this;
             payload.header = data.header;
@@ -256,45 +188,39 @@ var ChatBox = function(payload, state, socket, reload) {
         });
         
     };
-
     var sendMessage = function (data) {
-        // console.log(data);
         socket.emit('request_bot', data);
     }
-
     this.init = function () {
         var _this = this;
         _this.wrap.append(_this.box_head)
-        _this.box_content.append(_this.box_content_top);
-        _this.box_content.append(_this.box_content_chat);
+        _this.box_content_wrap.append(_this.box_content_chat)
+        _this.box_content.append(_this.box_content_wrap);
         _this.box_content.append(_this.box_content_input);
-        
         _this.wrap.append(_this.box_content);
         _this.dom.append(_this.wrap);
         _this.setState();
-
-        var btnToggle = _this.box_head.find("a.btnclose-min");
-
-        btnToggle.on('click',function(){
-            _this.state.full = _this.state.full == false;
-            setCookie('box_state',_this.state.full?1:0,10);
-            _this.setState();
+        var vs = _this.dom.find('.vs-icon-chat');
+        var wrap_close = _this.box_head.find('.btn-close');
+        vs.click(function(){
+            _this.setState({show:true});
+            setCookie('box_state',true?1:0,10);
             if(!_start){
                 _start = true;
                 socket.emit('start_bot',payload);
             }
         });
-
+        wrap_close.click(function(){
+            _this.setState({show:false});
+            setCookie('box_state',false?1:0,10);
+        });
         var box_state = getCookie('box_state');
         if(box_state){
-            _this.state.full = box_state==1;
-            _this.setState();
+            _this.setState({show:box_state==1});
         }
-
         if(reload === 1){
             socket.emit('start_bot',payload);
         }
-
         var textinput = _this.box_content_input.find("textarea");
         textinput.keydown(function (e) { 
             if (e.keyCode == 13 && e.shiftKey) {
@@ -309,36 +235,23 @@ var ChatBox = function(payload, state, socket, reload) {
                     var data = _this.createMessage($(this).val())
                     _this.displayMessage($(this).val(),true);   
                     sendMessage(data);
-
                     $(this).val("");
-                    
                 }
             }
         });
-        var btnGui = _this.box_content_input.find("button.btn-submit");
-            btnGui.click(function(e) {
-                e.preventDefault();
-                if (textinput.val() !== '' ) {
-                    var data = _this.createMessage(textinput.val());
-                    _this.displayMessage(textinput.val(),true);   
-                    sendMessage(data);
-                    textinput.val("");
-                    
-                }
-            });
         _setSocket();
         return _this;
     };
     return this.init();
 };
 var reload = 0;
+var chat_host = 'https://chatai.vnpt.vn/';
 function setCookie(cname,cvalue,exmis) {
   var d = new Date();
   d.setTime(d.getTime() + (exmis*60*1000));
   var expires = "expires=" + d.toGMTString();
   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
-
 function getCookie(cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -354,10 +267,8 @@ function getCookie(cname) {
   }
   return "";
 }
-
 function getChatAICookie(name) {
   var user=getCookie(name);
-
   if (user != "") {
     reload = 1;
     return user;
@@ -368,10 +279,8 @@ function getChatAICookie(name) {
     return user;
   }
 }
-
-var socket = io('https://chatai.vnpt.vn/');
+var socket = io(chat_host);
 var userSession = getChatAICookie("chatai");
-
 var payload = {header:{user:userSession},message:{content:reload==0?"/start":"/get_history_msg"}};
-var chatapp = new ChatBox(payload,{show:true, full:false, title:"Hãy chat với chúng tôi."},socket,reload);
+var chatapp = new ChatBox(payload,{show:false},socket,reload);
 $("body").append(chatapp.dom);
