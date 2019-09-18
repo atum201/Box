@@ -710,6 +710,8 @@ body {
   .vs-chat-popup .content-chat-box .mess-content .btn {
     background: rgba(0, 132, 255, 0.15);
     padding: 5px 10px;
+    text-transform: none;
+    font-weight: 100;
     color: #0064C1;
     font-size: 13px;
     border-radius: 3px;
