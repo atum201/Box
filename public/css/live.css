@@ -589,6 +589,7 @@ body {
         right: 0px; }
         .vs-chat-popup .vs-chat-heading .top .actions .btn {
           width: 30px;
+          min-width: 30px;
           padding: 0px;
           height: 30px;
           line-height: 30px;
