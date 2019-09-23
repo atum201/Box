@@ -28,6 +28,8 @@ var ChatBox = function(payload, state, socket, reload) {
         return s;
     };
 
+    var rep_button = [];
+
     var _showContentMessage = function(content){
         return content;
     }
@@ -93,6 +95,8 @@ var ChatBox = function(payload, state, socket, reload) {
         _this.box_content_wrap.scrollTop(10000000000);
     };
     this.displayMessageButton = function(template,index){
+        var _this = this;
+
         var btn = $("<div class=\"btn\">"+template.message.data[index].text+"</div>");
         btn.on('click',function(){
             var m = {
@@ -102,6 +106,7 @@ var ChatBox = function(payload, state, socket, reload) {
                 type:template.message.type
             };
             var message = {header:template.header,message:m}
+            _this.displayMessage(template.message.data[index].text,true);   
             sendMessage(message);
         })
         return btn;
@@ -133,6 +138,7 @@ var ChatBox = function(payload, state, socket, reload) {
                     message.data.map(function(d,i){
                         var t = {header:template.header,message:message}
                         temp.find('.mess-content').append(_this.displayMessageButton(t,i));
+                        rep_button.push(d);
                     })
                     t_temp = "Bot";
                     break;
@@ -161,7 +167,10 @@ var ChatBox = function(payload, state, socket, reload) {
                                     "</div><div class=\"mess-content\"></div></div>");
                         t_temp = 'Bot';
                     }
-                    temp.find('.mess-content').append("<div class=\"mess\">"+message.content+"</div>")
+                    var ctn = message.content;
+                    for(var i = 0; i< rep_button.length;i++)
+                        ctn = ctn == rep_button[i].payload ? rep_button[i].text : ctn;
+                    temp.find('.mess-content').append("<div class=\"mess\">"+ctn+"</div>")
                     break;
             }
         })
