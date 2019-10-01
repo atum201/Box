@@ -184,9 +184,15 @@ var ChatBox = function(payload, state, socket, reload) {
             _this.box_content_wrap.scrollTop(10000000000);    
         }
     };
+    this.validateMessage = function(content){
+        content = content.replace("<","&#60;");
+        content = content.replace(">","&#62;");
+        content = content.replace("/","&#47;");
+        return content;
+    };
     this.createMessage = function (content) { // 
         var _this = this;
-        
+        content = _this.validateMessage(content);
         payload.message = {"id":"","content":content,"type":"","data":[]}
         return payload;    
     };
@@ -244,7 +250,7 @@ var ChatBox = function(payload, state, socket, reload) {
                 e.preventDefault();
                 if ($(this).val() !== '' ) {
                     var data = _this.createMessage($(this).val())
-                    _this.displayMessage($(this).val(),true);   
+                    _this.displayMessage(data.message.content,true);   
                     sendMessage(data);
                     $(this).val("");
                 }

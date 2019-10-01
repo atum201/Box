@@ -39,7 +39,7 @@ let callApi = function (
 
 let socker = [];
 
-let store = {};
+let store = []; //{}
 
 io.on('connection', async function (socket) {
     try {
