@@ -27,6 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
          
 let endpoint = 'https://chatbot.idg.vnpt.vn/egov/api/v1/client/chat';
 
+let endpointDev = 'https://chatbot.idg.vnpt.vn/egov/api/v1.1/client/chat';
+
 let callApi = function (
   endpoint,
   data = null
@@ -67,6 +69,29 @@ io.on('connection', async function (socket) {
           data.header.session = socket.id;
           console.log(socket.id, data)
           callApi(endpoint,data).then(res=>{
+            console.log(res)
+            socket.emit('send_message',{content:res.data});
+          })
+        })
+
+        socket.on('start_botDev',function (data) { // {header: {account:"",session:""}, message:{}}
+          console.log(socket.id,data)
+          if(data.header && data.header.account){
+            socket.account = data.header.account;
+          }
+          socker.push(socket)
+          data.header.session = socket.id;
+          console.log()
+          callApi(endpointDev,data).then(res=>{
+            console.log(res)
+            socket.emit('send_message',{content:res.data});
+          })
+        })
+
+        socket.on('request_botDev',function (data) { // {header: {account:"",session:""}, message:{}}
+          data.header.session = socket.id;
+          console.log(socket.id, data)
+          callApi(endpointDev,data).then(res=>{
             console.log(res)
             socket.emit('send_message',{content:res.data});
           })

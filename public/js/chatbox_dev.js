@@ -200,7 +200,7 @@ var ChatBox = function(payload, state, socket, reload) {
         
     };
     var sendMessage = function (data) {
-        socket.emit('request_bot', data);
+        socket.emit('request_botDev', data);
     }
     this.init = function () {
         var _this = this;
@@ -218,7 +218,7 @@ var ChatBox = function(payload, state, socket, reload) {
             setCookie('box_state',true?1:0,10);
             if(!_start){
                 _start = true;
-                socket.emit('start_bot',payload);
+                socket.emit('start_botDev',payload);
             }
         });
         wrap_close.click(function(){
@@ -230,7 +230,7 @@ var ChatBox = function(payload, state, socket, reload) {
             _this.setState({show:box_state==1});
         }
         if(reload === 1){
-            socket.emit('start_bot',payload);
+            socket.emit('start_botDev',payload);
         }
         var textinput = _this.box_content_input.find("textarea");
         textinput.keydown(function (e) { 
