@@ -52,7 +52,7 @@ io.on('connection', async function (socket) {
         })
 
         socket.on('request_bot',function (data) { // {header: {account:"",session:""}, message:{}}
-          callApi(endpointD,data).then(res=>{
+          callApi(endpoint,data).then(res=>{
             socket.emit('send_message',res.data);
           })
 
